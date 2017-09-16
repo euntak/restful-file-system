@@ -10,9 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Map;
-
-@RestController ("/api/files")
+@RestController
+@RequestMapping ("/api/files")
 public class FileRestController {
 
     FileService fileService;
@@ -23,18 +22,25 @@ public class FileRestController {
         this.fileService = fileService;
     }
 
+
     @GetMapping
     @ResponseStatus (HttpStatus.OK)
-    Map<String, String> getAllfiles() {
+    public ResponseEntity<?> getAllfiles() {
 
-        return fileService.getAllFiles();
+        HttpHeaders headers = new HttpHeaders(); // Http Headers
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+//        Boolean isSuccess = (boolean) fileService.getAllFiles().get("isSuccess");
+//        System.err.println("isSuccess : " + fileService.getAllFiles());
+
+        return new ResponseEntity<>(fileService.getAllFiles(), headers, HttpStatus.OK);
     }
 
     @PostMapping (headers = ("content-type=multipart/*"))
     @ResponseBody
     public ResponseEntity<?> upload(@RequestParam ("file") MultipartFile[] files) {
 
-        HttpHeaders headers = new HttpHeaders(); // Http Headers
+        HttpHeaders headers = new HttpHeaders();
 
         if (files.length == 0) {
             return new ResponseEntity<FileInfo>(HttpStatus.BAD_REQUEST);
@@ -43,5 +49,28 @@ public class FileRestController {
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity<>(fileService.uploadMultiFiles(files), headers, HttpStatus.OK);
 
+    }
+
+    @PutMapping (value = "/{fileId}", headers = "content-type=multipart/*")
+    @ResponseBody
+    public ResponseEntity<?> update(@PathVariable Long fileId,
+                                    @RequestParam ("file") MultipartFile[] files) {
+
+        HttpHeaders headers = new HttpHeaders();
+
+        if (files.length == 0 || files.length > 1) {
+            return new ResponseEntity<FileInfo>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(fileService.updateFile(fileId, files[0]), headers, HttpStatus.OK);
+    }
+
+
+    @DeleteMapping (value = "/{fileId}")
+    public ResponseEntity<?> delete(@PathVariable Long fileId) {
+
+        System.err.println("Delete fileId : " + fileId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

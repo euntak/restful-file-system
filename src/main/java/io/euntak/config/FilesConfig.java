@@ -1,5 +1,6 @@
 package io.euntak.config;
 
+import io.euntak.resolver.CustomMultipartResolver;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,10 +21,13 @@ public class FilesConfig {
     @Bean
     public MultipartResolver multipartResolver() {
 
-        org.springframework.web.multipart.commons.CommonsMultipartResolver multipartResolver = new org.springframework.web.multipart.commons.CommonsMultipartResolver();
+        CustomMultipartResolver multipartResolver = new CustomMultipartResolver();
         multipartResolver.setMaxUploadSize(uploadMaxFileSize);
+        // Whether to resolve the multipart request lazily at the time of file or parameter access.
+        multipartResolver.setResolveLazily(false);
         return multipartResolver;
     }
+
 
     @Bean
     public String getBaseDireroty() {
