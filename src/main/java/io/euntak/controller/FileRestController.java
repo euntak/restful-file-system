@@ -15,8 +15,12 @@ import java.util.Map;
 @RestController("/api/files")
 public class FileRestController {
 
-    @Autowired
     FileService fileService;
+
+    @Autowired
+    public FileRestController(FileService fileService) {
+        this.fileService = fileService;
+    }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
