@@ -17,48 +17,51 @@ import java.util.*;
 @Service
 public class FileServiceImpl implements FileService {
 
-    @Value("${spring.uploadfile.root-directory}")
+    @Value ("${spring.uploadfile.root-directory}")
     private String localDirectory;
     private FileDao fileDao;
 
     @Autowired
     public FileServiceImpl(FileDao fileDao) {
-        this.fileDao=fileDao;
+
+        this.fileDao = fileDao;
     }
 
     @Override
     public Map<String, String> getAllFiles() {
+
         return null;
     }
 
     public Map<String, Object> uploadMultiFiles(MultipartFile[] files) {
-        Map message=new HashMap<String, Object>();
-        List<Long> uploadedfiles=new ArrayList<>();
 
-        String createTime=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
-        String curtime=new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-        String savePath=localDirectory + File.separator + curtime;
+        Map message = new HashMap<String, Object>();
+        List<Long> uploadedfiles = new ArrayList<>();
+
+        String createTime = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
+        String curtime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        String savePath = localDirectory + File.separator + curtime;
 
         for (MultipartFile file : files) {
-            String contentType=file.getContentType();
-            String originalFilename=file.getOriginalFilename();
-            long size=file.getSize();
+            String contentType = file.getContentType();
+            String originalFilename = file.getOriginalFilename();
+            long size = file.getSize();
 
-            String uuid=UUID.randomUUID().toString();
-            String saveFileName=savePath + File.separator + uuid;
+            String uuid = UUID.randomUUID().toString();
+            String saveFileName = savePath + File.separator + uuid;
 
             // 실제 저장될 폴더가 없으면 폴더 생성
-            if (!new File(savePath).isDirectory()) {
+            if (! new File(savePath).isDirectory()) {
                 new File(savePath).mkdirs();
             }
 
             // try-with-resource 구문. close()를 할 필요가 없다. java 7 이상에서 가능
-            try (InputStream in=file.getInputStream();
-                 FileOutputStream fos=new FileOutputStream(saveFileName)) {
+            try (InputStream in = file.getInputStream();
+                 FileOutputStream fos = new FileOutputStream(saveFileName)) {
                 int readCount;
-                byte[] buffer=new byte[512];
+                byte[] buffer = new byte[512];
 
-                while ((readCount=in.read(buffer)) != -1) {
+                while ((readCount = in.read(buffer)) != - 1) {
                     fos.write(buffer, 0, readCount);
                 }
 
@@ -66,7 +69,7 @@ public class FileServiceImpl implements FileService {
                 ex.printStackTrace();
             }
 
-            FileInfo fileInfo=new FileInfo(); // File Info
+            FileInfo fileInfo = new FileInfo(); // File Info
 
             fileInfo.setCreateDate(createTime);
             fileInfo.setModifyDate(createTime);

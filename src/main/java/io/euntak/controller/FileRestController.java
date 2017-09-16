@@ -12,25 +12,28 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
-@RestController("/api/files")
+@RestController ("/api/files")
 public class FileRestController {
 
     FileService fileService;
 
     @Autowired
     public FileRestController(FileService fileService) {
+
         this.fileService = fileService;
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus (HttpStatus.OK)
     Map<String, String> getAllfiles() {
+
         return fileService.getAllFiles();
     }
 
-    @PostMapping(headers = ("content-type=multipart/*"))
+    @PostMapping (headers = ("content-type=multipart/*"))
     @ResponseBody
-    public ResponseEntity<?> upload(@RequestParam("file") MultipartFile[] files) {
+    public ResponseEntity<?> upload(@RequestParam ("file") MultipartFile[] files) {
+
         HttpHeaders headers = new HttpHeaders(); // Http Headers
 
         if (files.length == 0) {

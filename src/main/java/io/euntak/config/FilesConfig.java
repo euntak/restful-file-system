@@ -7,18 +7,19 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.multipart.MultipartResolver;
 
 @Configuration
-@PropertySource("classpath:/files.properties")
+@PropertySource ("classpath:/files.properties")
 public class FilesConfig {
 
-    @Value("${spring.uploadfile.max-size}")
+    @Value ("${spring.uploadfile.max-size}")
     private long uploadMaxFileSize;
 
-    @Value("${spring.uploadfile.root-directory}")
+    @Value ("${spring.uploadfile.root-directory}")
     private String baseDiretory;
 
 
     @Bean
     public MultipartResolver multipartResolver() {
+
         org.springframework.web.multipart.commons.CommonsMultipartResolver multipartResolver = new org.springframework.web.multipart.commons.CommonsMultipartResolver();
         multipartResolver.setMaxUploadSize(uploadMaxFileSize);
         return multipartResolver;
@@ -26,6 +27,7 @@ public class FilesConfig {
 
     @Bean
     public String getBaseDireroty() {
+
         return baseDiretory;
     }
 }

@@ -20,6 +20,7 @@ public class WebInitializer implements WebApplicationInitializer {
 
     @Override
     public void onStartup(ServletContext servletContext) throws ServletException {
+
         WebApplicationContext context = getContext();
 
         // encoding filter 설정
@@ -42,6 +43,7 @@ public class WebInitializer implements WebApplicationInitializer {
     }
 
     private AnnotationConfigWebApplicationContext getContext() {
+
         AnnotationConfigWebApplicationContext context = new AnnotationConfigWebApplicationContext();
         context.setConfigLocation(CONFIG_LOCATION);
         return context;

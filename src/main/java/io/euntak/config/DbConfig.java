@@ -12,23 +12,24 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 
 @Configuration
-@PropertySource("classpath:/application.properties")
+@PropertySource ("classpath:/application.properties")
 @EnableTransactionManagement
 public class DbConfig {
-    @Value("${spring.datasource.driver-class-name}")
+    @Value ("${spring.datasource.driver-class-name}")
     private String driverClassName;
 
-    @Value("${spring.datasource.url}")
+    @Value ("${spring.datasource.url}")
     private String url;
 
-    @Value("${spring.datasource.username}")
+    @Value ("${spring.datasource.username}")
     private String username;
 
-    @Value("${spring.datasource.password}")
+    @Value ("${spring.datasource.password}")
     private String password;
 
     @Bean
     public DataSource dataSource() {
+
         BasicDataSource dataSource = new BasicDataSource();
         dataSource.setDriverClassName(driverClassName);
         dataSource.setUrl(url);
@@ -39,6 +40,7 @@ public class DbConfig {
 
     @Bean
     public PlatformTransactionManager transactionManger() {
+
         return new DataSourceTransactionManager(dataSource());
     }
 }
