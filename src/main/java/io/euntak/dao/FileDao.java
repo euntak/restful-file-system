@@ -11,5 +11,7 @@ public interface FileDao {
 
     Long insert(FileInfo f);
 
+    int delete(Long fileId);
+
     List<FileInfo> selectAllFiles();
 }

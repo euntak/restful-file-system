@@ -21,4 +21,7 @@ public class FileSqls {
                     + " modify_date = :modifyDate "
                     + " WHERE delete_flag = 0 "
                     + " AND id = :fileId";
+
+    final static String DELETE_FILE_BY_ID =
+            "DELETE FROM file WHERE id = :fileId";
 }

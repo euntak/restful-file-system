@@ -49,6 +49,16 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    public FileInfo getFile(Long fileId) {
+
+        FileInfo selectedFile = fileDao.selectFileById(fileId);
+
+        if (selectedFile != null) return selectedFile;
+
+        return null;
+    }
+
+    @Override
     public FileInfo writeFile(MultipartFile file) {
 
         String createTime = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss").format(new Date());
@@ -94,9 +104,38 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public FileInfo removeFile(String removeFileName) {
+    public boolean removeFile(FileInfo fileInfo) {
 
-        return null;
+        String savedFile = fileInfo.getSaveFileName();
+        File file = new File(savedFile);
+
+        return file.delete();
+
+    }
+
+    @Override
+    public Map<String, Object> deleteFile(Long fileId) {
+
+        int isDelete = 0;
+        Map message = new HashMap<String, Object>();
+        FileInfo fileInfo = getFile(fileId);
+
+        if (fileInfo != null && removeFile(fileInfo)) {
+            isDelete = fileDao.delete(fileId);
+        }
+
+        message.put("location", "/api/files");
+
+        if (isDelete > 0) {
+            message.put("success", true);
+            message.put("deletedFileId", fileId);
+            message.put("summary", "Delete Files successfully");
+        } else {
+            message.put("success", false);
+            message.put("summary", "Delete Files failure");
+        }
+
+        return message;
     }
 
     @Override
@@ -111,9 +150,6 @@ public class FileServiceImpl implements FileService {
 
         Map message = new HashMap<String, Object>();
         FileInfo fileInfo = writeFile(file);
-
-        System.err.println("savedFileName Update :" + fileInfo.toString());
-
         fileDao.updateFileById(fileId, fileInfo);
 
         message.put("success", true);

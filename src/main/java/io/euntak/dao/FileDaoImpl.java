@@ -1,6 +1,7 @@
 package io.euntak.dao;
 
 import io.euntak.domain.FileInfo;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
@@ -31,7 +32,12 @@ public class FileDaoImpl implements FileDao {
     public FileInfo selectFileById(Long fileId) {
 
         Map<String, ?> params = Collections.singletonMap("fileId", fileId);
-        return jdbc.queryForObject(FileSqls.SELECT_FILE_BY_ID, params, rowMapper);
+
+        try {
+            return jdbc.queryForObject(FileSqls.SELECT_FILE_BY_ID, params, rowMapper);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     @Override
@@ -54,6 +60,14 @@ public class FileDaoImpl implements FileDao {
 
         SqlParameterSource params = new BeanPropertySqlParameterSource(f);
         return insertAction.executeAndReturnKey(params).longValue();
+    }
+
+    @Override
+    public int delete(Long fileId) {
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("fileId", fileId);
+        return jdbc.update(FileSqls.DELETE_FILE_BY_ID, params);
     }
 
     @Override

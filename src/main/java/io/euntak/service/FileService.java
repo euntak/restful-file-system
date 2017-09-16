@@ -8,10 +8,13 @@ import java.util.Map;
 public interface FileService {
     Map<String, String> getAllFiles();
 
+    FileInfo getFile(Long fileId);
+
     FileInfo writeFile(MultipartFile file);
 
-    FileInfo removeFile(String removeFileName);
+    boolean removeFile(FileInfo fileIndo);
 
+    Map<String, Object> deleteFile(Long fileId);
 
     Map<String, Object> updateFile(Long fileId, MultipartFile file);
 

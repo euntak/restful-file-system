@@ -33,21 +33,18 @@ public class FileRestController {
 //        Boolean isSuccess = (boolean) fileService.getAllFiles().get("isSuccess");
 //        System.err.println("isSuccess : " + fileService.getAllFiles());
 
-        return new ResponseEntity<>(fileService.getAllFiles(), headers, HttpStatus.OK);
+        return new ResponseEntity<>(fileService.getAllFiles(), HttpStatus.OK);
     }
 
     @PostMapping (headers = ("content-type=multipart/*"))
     @ResponseBody
     public ResponseEntity<?> upload(@RequestParam ("file") MultipartFile[] files) {
 
-        HttpHeaders headers = new HttpHeaders();
-
         if (files.length == 0) {
             return new ResponseEntity<FileInfo>(HttpStatus.BAD_REQUEST);
         }
 
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        return new ResponseEntity<>(fileService.uploadMultiFiles(files), headers, HttpStatus.OK);
+        return new ResponseEntity<>(fileService.uploadMultiFiles(files), HttpStatus.OK);
 
     }
 
@@ -56,21 +53,17 @@ public class FileRestController {
     public ResponseEntity<?> update(@PathVariable Long fileId,
                                     @RequestParam ("file") MultipartFile[] files) {
 
-        HttpHeaders headers = new HttpHeaders();
-
         if (files.length == 0 || files.length > 1) {
             return new ResponseEntity<FileInfo>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(fileService.updateFile(fileId, files[0]), headers, HttpStatus.OK);
+        return new ResponseEntity<>(fileService.updateFile(fileId, files[0]), HttpStatus.OK);
     }
 
 
     @DeleteMapping (value = "/{fileId}")
     public ResponseEntity<?> delete(@PathVariable Long fileId) {
 
-        System.err.println("Delete fileId : " + fileId);
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(fileService.deleteFile(fileId), HttpStatus.OK);
     }
 }
