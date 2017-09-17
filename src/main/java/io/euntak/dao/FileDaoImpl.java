@@ -76,4 +76,12 @@ public class FileDaoImpl implements FileDao {
         Map<String, Object> params = Collections.emptyMap();
         return jdbc.query(FileSqls.SELECT_ALL_FILES, params, rowMapper);
     }
+
+    @Override
+    public List<FileInfo> selectFilesByFilter(String type) {
+        Map<String, String> params = new HashMap<>();
+        params.put("contentType", "image/" + type.toLowerCase());
+
+        return jdbc.query(FileSqls.SELECT_FILES_BY_TYPE, params, rowMapper);
+    }
 }

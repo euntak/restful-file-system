@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -28,9 +29,9 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public Map<String, String> getAllFiles() {
+    public Map<String, Object> getAllFiles() {
 
-        Map resultMessage = new HashMap<String, Object>();
+        Map<String, Object> resultMessage = new HashMap<>();
         List<FileInfo> selectedFiles = fileDao.selectAllFiles();
         if (selectedFiles.size() > 0) {
             resultMessage.put("message", "get All files Successful");
@@ -44,6 +45,34 @@ public class FileServiceImpl implements FileService {
             resultMessage.put("location", "/api/files");
         }
 
+
+        return resultMessage;
+    }
+
+    @Override
+    public Map<String, Object> getFiles(String type) {
+
+        List<FileInfo> selectedFiles = null;
+
+        if (! type.isEmpty()) {
+            selectedFiles = fileDao.selectFilesByFilter(type);
+        } else {
+            selectedFiles = fileDao.selectAllFiles();
+        }
+
+        Map<String, Object> resultMessage = new HashMap<>();
+
+        if (selectedFiles != null && selectedFiles.size() > 0) {
+            resultMessage.put("message", "get files Successful By types : " + type);
+            resultMessage.put("isSuccess", true);
+            resultMessage.put("files", selectedFiles);
+            resultMessage.put("location", "/api/files");
+        } else {
+            resultMessage.put("message", "get filtered files Failure!");
+            resultMessage.put("isSuccess", false);
+            resultMessage.put("files", selectedFiles);
+            resultMessage.put("location", "/api/files");
+        }
 
         return resultMessage;
     }
@@ -65,7 +94,15 @@ public class FileServiceImpl implements FileService {
         String curtime = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
         String savePath = localDirectory + File.separator + curtime;
         String contentType = file.getContentType();
-        String originalFilename = file.getOriginalFilename();
+        String originalFilename = null;
+
+        try {
+            originalFilename = new String(file.getOriginalFilename().getBytes("8859_1"), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+
         long size = file.getSize();
 
         String uuid = UUID.randomUUID().toString();
@@ -117,7 +154,7 @@ public class FileServiceImpl implements FileService {
     public Map<String, Object> deleteFile(Long fileId) {
 
         int isDelete = 0;
-        Map message = new HashMap<String, Object>();
+        Map<String, Object> message = new HashMap<>();
         FileInfo fileInfo = getFile(fileId);
 
         if (fileInfo != null && removeFile(fileInfo)) {
@@ -141,28 +178,32 @@ public class FileServiceImpl implements FileService {
     @Override
     public Map<String, Object> updateFile(Long fileId, MultipartFile file) {
 
-        System.err.println("file : " + file + " fileId : " + fileId);
-
-
         if (file == null) {
             return null;
         }
 
-        Map message = new HashMap<String, Object>();
+        Map<String, Object> message = new HashMap<>();
         FileInfo fileInfo = writeFile(file);
-        fileDao.updateFileById(fileId, fileInfo);
+        int isSuccess = fileDao.updateFileById(fileId, fileInfo);
 
-        message.put("success", true);
+        if (isSuccess > 0) {
+            message.put("success", true);
+            message.put("summary", "Update Files successfully");
+        } else {
+            message.put("success", false);
+            message.put("summary", "Update Files failure");
+        }
+
         message.put("updatefileId", fileId);
         message.put("location", "/api/files");
-        message.put("summary", "Update Files successfully");
+
 
         return message;
     }
 
     public Map<String, Object> uploadMultiFiles(MultipartFile[] files) {
 
-        Map message = new HashMap<String, Object>();
+        Map<String, Object> message = new HashMap<>();
         List<Long> uploadedfiles = new ArrayList<>();
 
         for (MultipartFile file : files) {

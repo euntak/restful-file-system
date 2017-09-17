@@ -6,7 +6,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 public interface FileService {
-    Map<String, String> getAllFiles();
+    Map<String, Object> getAllFiles();
+
+    Map<String, Object> getFiles(String type);
 
     FileInfo getFile(Long fileId);
 

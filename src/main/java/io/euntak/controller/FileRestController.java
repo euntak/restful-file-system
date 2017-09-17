@@ -7,8 +7,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping ("/api/files")
@@ -22,16 +29,52 @@ public class FileRestController {
         this.fileService = fileService;
     }
 
+    @GetMapping (value = "/{fileId:[\\d]+}")
+    @ResponseBody
+    public ResponseEntity<?> getFile(@PathVariable Long fileId) throws IOException {
+
+        File file = null;
+        String mimeType = null;
+        HttpHeaders headers = new HttpHeaders();
+        Map<String, Object> message = new HashMap<>();
+        message.put("location", "/api/files/{fileId}");
+
+        FileInfo selectedFile = fileService.getFile(fileId);
+
+        if (selectedFile == null) {
+            message.put("message", "Failure DB get FileInfo");
+            message.put("success", false);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            mimeType = URLConnection.guessContentTypeFromName(selectedFile.getContentType());
+            file = new File(selectedFile.getSaveFileName());
+        }
+
+        if (file != null && ! file.exists()) {
+            message.put("message", "File NOT Found");
+            message.put("success", false);
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        if (mimeType == null) {
+            mimeType = "application/octet-stream";
+        }
+
+        byte[] document = FileCopyUtils.copyToByteArray(file);
+        headers.setContentType(MediaType.valueOf(mimeType));
+        headers.set("Content-Disposition", "attachment; filename=" + file.getName());
+        headers.setContentLength(document.length);
+
+        return new ResponseEntity(document, headers, HttpStatus.OK);
+
+    }
 
     @GetMapping
-    @ResponseStatus (HttpStatus.OK)
-    public ResponseEntity<?> getAllfiles() {
+    public ResponseEntity<?> getAllFiles(@RequestParam (required = false) String type) {
 
-        HttpHeaders headers = new HttpHeaders(); // Http Headers
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-//        Boolean isSuccess = (boolean) fileService.getAllFiles().get("isSuccess");
-//        System.err.println("isSuccess : " + fileService.getAllFiles());
+        if (type != null) {
+            return new ResponseEntity<>(fileService.getFiles(type), HttpStatus.OK);
+        }
 
         return new ResponseEntity<>(fileService.getAllFiles(), HttpStatus.OK);
     }
@@ -48,7 +91,7 @@ public class FileRestController {
 
     }
 
-    @PutMapping (value = "/{fileId}", headers = "content-type=multipart/*")
+    @PutMapping (value = "/{fileId:[\\d]+}", headers = "content-type=multipart/*")
     @ResponseBody
     public ResponseEntity<?> update(@PathVariable Long fileId,
                                     @RequestParam ("file") MultipartFile[] files) {
@@ -61,9 +104,10 @@ public class FileRestController {
     }
 
 
-    @DeleteMapping (value = "/{fileId}")
+    @DeleteMapping (value = "/{fileId:[\\d]+}")
     public ResponseEntity<?> delete(@PathVariable Long fileId) {
 
+        if (fileId <= 0) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         return new ResponseEntity<>(fileService.deleteFile(fileId), HttpStatus.OK);
     }
 }

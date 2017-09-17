@@ -14,4 +14,6 @@ public interface FileDao {
     int delete(Long fileId);
 
     List<FileInfo> selectAllFiles();
+
+    List<FileInfo> selectFilesByFilter(String type);
 }

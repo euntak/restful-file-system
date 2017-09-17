@@ -8,6 +8,13 @@ public class FileSqls {
                     + " WHERE id = :fileId "
                     + " AND delete_flag = 0 ";
 
+    final static String SELECT_FILES_BY_TYPE =
+            "SELECT"
+                    + " id, file_name, save_file_name, file_length, content_type"
+                    + " FROM file "
+                    + " WHERE delete_flag = 0 "
+                    + " AND content_type = :contentType";
+
     final static String SELECT_ALL_FILES =
             "SELECT"
                     + " id, file_name, save_file_name, file_length, content_type"

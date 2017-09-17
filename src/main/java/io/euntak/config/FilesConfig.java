@@ -23,7 +23,6 @@ public class FilesConfig {
 
         CustomMultipartResolver multipartResolver = new CustomMultipartResolver();
         multipartResolver.setMaxUploadSize(uploadMaxFileSize);
-        // Whether to resolve the multipart request lazily at the time of file or parameter access.
         multipartResolver.setResolveLazily(false);
         return multipartResolver;
     }
